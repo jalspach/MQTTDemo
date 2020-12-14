@@ -9,6 +9,9 @@ import (
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
 
+//watch here: http://www.hivemq.com/demos/websocket-client/
+//documentation here: https://pkg.go.dev/github.com/eclipse/paho.mqtt.golang
+
 //define a function for the default message handler
 var f MQTT.MessageHandler = func(client MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("TOPIC: %s\n", msg.Topic())
@@ -19,8 +22,9 @@ func main() {
 	//create a ClientOptions struct setting the broker address, clientid, turn
 	//off trace output and set the default message handler
 	opts := MQTT.NewClientOptions().AddBroker("tcp://broker.hivemq.com:1883")
-	opts.SetClientID("clientId-E7gUa4blf9")
+	opts.SetClientID("clientId-memememe")
 	opts.SetDefaultPublishHandler(f)
+	opts.SetWill("testtopic/james/lwt", "HCF - Elvis has left the building", 2, false)
 
 	//create and start a client using the above ClientOptions
 	c := MQTT.NewClient(opts)
@@ -39,12 +43,12 @@ func main() {
 	//from the server after sending each message
 	for i := 0; i < 5; i++ {
 		text := fmt.Sprintf("this is msg #%d!", i)
-		token := c.Publish("testtopic/james/3", 1, false, text)
+		token := c.Publish("testtopic/james/3", 0, false, text)
 		token.Wait()
 
 		dt := time.Now()
-		curr := fmt.Sprintf("Current date and time is: ", dt.Format("01-02-2006 15:04:05"))
-		token2 := c.Publish("testtopic/james/curtime", 0, false, curr)
+		curr := fmt.Sprintf("Current date and time is: $d", dt.Format("01-02-2006 15:04:05"))
+		token2 := c.Publish("testtopic/james/curtime", 1, false, curr)
 		token2.Wait()
 	}
 
